@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+*{
+	box-sizing: border-box;
+	font-family: sane serif;
+}
+
+.tabs-container {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	background-color: red;
+}

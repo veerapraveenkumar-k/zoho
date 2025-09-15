@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+*{
+	box-sizing: border-box;
+	font-family: sane serif;
+}
+
+.heade{
+	width: 100%;
+	height: 10vh;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: white;
+	border-bottom: 1px solid gray;
+	padding: 0px 20px 0px 20px;
+}
+
+.welcome {
+	font-size: 20px;
+}
