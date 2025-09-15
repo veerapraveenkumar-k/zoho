@@ -196,4 +196,21 @@ public class InstanceDao {
 		return jsonInstanceObj;
 	}
 	
+	public static String deleteInstance(int instanceId) {
+		try {
+			Connection db = Db.getConnection();
+			String query = "DELETE u, uid, instance FROM all_users as u JOIN user_instance_details as uid ON u.id = uid.user_id JOIN instance ON uid.instance_id = instance.id WHERE instance.id = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setInt(1, instanceId);
+			int row = ps.executeUpdate();
+			if(row > 0) {
+				return "Instance Successfully Deleted.";
+			}
+			return "Failed to delete Instance.";
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return "Failed to delete Instance.";
+	}
+	
 }

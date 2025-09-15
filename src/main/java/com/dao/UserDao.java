@@ -12,12 +12,10 @@ public class UserDao {
 		try {
 			Connection db = Db.getConnection();
 			String query = "SELECT all_users.id, all_users.username, all_users.password, " + tableName + ".email , "+tableName + ".mobile_no from all_users join " + tableName + " on all_users.id = " + tableName + ".user_id where all_users.username = ?";
-			//System.out.println(query);
 			PreparedStatement ps = db.prepareStatement(query);
 			ps.setString(1, name);
 			ResultSet rs = ps.executeQuery();
 			if(rs.next()) {
-				//System.out.println("called");
 				user.setId(rs.getInt("id"));
 				user.setUserName(rs.getString("username"));
 				user.setPassword(rs.getString("password"));
@@ -73,7 +71,23 @@ public class UserDao {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		//System.out.println(usersList.size());
 		return usersList;
+	}
+	
+	public static String deleteUsers(int id) {
+			try {
+				Connection db = Db.getConnection();
+				String query = "DELETE FROM all_users WHERE id = ?";
+				PreparedStatement ps = db.prepareStatement(query);
+				ps.setInt(1, id);
+				int row = ps.executeUpdate();
+				if(row > 0) {
+					return "User Successfully Deleted.";
+				}
+				return "Failed to delete User.";
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			return "Failed to delete User.";
 	}
 }

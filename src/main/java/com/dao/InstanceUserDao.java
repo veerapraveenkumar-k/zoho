@@ -115,7 +115,7 @@ public class InstanceUserDao {
 			PreparedStatement ps3 = db.prepareStatement(query3);
 			PreparedStatement ps4 = db.prepareStatement(query4);
 			for(JsonUser user: usersList) {
-				System.out.println(user.getMobileNum());
+				//System.out.println(user.getMobileNum());
 				ps1.setString(1, user.getUserName());
 				ps1.setString(2, user.getPassword());
 				ps1.setString(3, "USER");

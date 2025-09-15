@@ -58,7 +58,15 @@
 		color: black;
 		font-size: 16px;
 	}
-
+	
+	.action-container {
+		display: flex;
+		align-items: center;
+	}
+	
+	.import-btn {
+		margin-right: 20px;
+	}
 </style>
 </head>
 <body>
@@ -82,6 +90,10 @@
 		</div>
 		<c:if test="${instanceList.size() > 0}">
 			<h1>Instance List: </h1>
+			<c:if test="${not empty sessionScope.msg }">
+				<p>${sessionScope.msg}</p>
+				<c:remove var="msg" scope="session"/>
+			</c:if>
 			<table  class="user-table">
 				<thead class="table-header">
 					<tr>
@@ -95,9 +107,12 @@
 						<tr>
 							<td class="body">${instance.getId()}</td>
 							<td class="body">${instance.getType()}</td>
-							<td class="body">
+							<td class="body action-container">
 								<form action="importUsers" method="post">
 									<button class="import-btn" value="${instance.getId()}" type="submit" name="import"> Import </button>
+								</form>
+								<form action="deleteInstance" method="post">
+									<button class="import-btn" value="${instance.getId()}" type="submit" name="delete"> Delete </button>
 								</form>
 							</td>
 						</tr>
@@ -107,5 +122,13 @@
 			<p>${msg}</p>
 		</c:if>
 	</div>
+<script>
+	/*const deleteInstance = async (id) => {
+		await fetch('/home/deleteInstance', {
+			methods: "DELETE"
+		})
+	}*/
+	
+</script>
 </body>
 </html>

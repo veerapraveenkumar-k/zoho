@@ -91,4 +91,20 @@
   	<servlet-name>JsonConfig</servlet-name>
   	<url-pattern>/home/jsonConfig</url-pattern>
   </servlet-mapping>
+  <servlet>
+  	<servlet-name>DeleteInstance</servlet-name>
+  	<servlet-class>com.controllers.DeleteInstance</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>DeleteInstance</servlet-name>
+  	<url-pattern>/home/deleteInstance</url-pattern>
+  </servlet-mapping>
+  <servlet>
+  	<servlet-name>DeleteUsers</servlet-name>
+  	<servlet-class>com.controllers.DeleteUsers</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>DeleteUsers</servlet-name>
+  	<url-pattern>/home/deleteUsers</url-pattern>
+  </servlet-mapping>
 </web-app>
