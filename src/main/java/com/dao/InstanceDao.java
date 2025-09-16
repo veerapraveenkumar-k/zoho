@@ -214,7 +214,7 @@ public class InstanceDao {
 		return "Failed to delete Instance.";
 	}
 	
-	public static String checkApiInstance(String url, int adminId) {
+	public static String checkApiInstance(String apiKey, String url, int adminId) {
 		try {
 			Connection db = Db.getConnection();
 			String query = "SELECT * FROM api_instance WHERE url = ?";
@@ -224,18 +224,18 @@ public class InstanceDao {
 			if(rs.next()) {
 				return "instance already present";
 			}
-			return createApiInstance(url, adminId);
+			return createApiInstance(apiKey, url, adminId);
 		}catch(Exception e) {
 			e.printStackTrace();
 			return "failed to create instance";
 		}
 	}
 	
-	public static String createApiInstance(String url, int adminId) {
+	public static String createApiInstance(String token, String url, int adminId) {
 		try {
 			Connection db = Db.getConnection();
 			String query = "INSERT INTO instance (type, admin_id) VALUES (?, ?)";
-			String query1 = "INSERT INTO api_instance (instance_id, url) VALUES (?, ?)";
+			String query1 = "INSERT INTO api_instance (instance_id, url, api_token) VALUES (?, ?, ?)";
 			PreparedStatement ps = db.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, "API");
 			ps.setInt(2, adminId);
@@ -248,6 +248,7 @@ public class InstanceDao {
 					PreparedStatement ps1 = db.prepareStatement(query1);
 					ps1.setInt(1, instanceId);
 					ps1.setString(2, url);
+					ps1.setString(3, token);
 					int row1 = ps1.executeUpdate();
 					if(row1 > 0) {
 						return "Instance Created Successfully";
@@ -272,6 +273,7 @@ public class InstanceDao {
 			if(rs.next()) {
 				apiInstanceObj.setId(rs.getInt("instance_id"));
 				apiInstanceObj.setUrl(rs.getString("url"));
+				apiInstanceObj.setToken(rs.getString("api_token"));
 			}
 			return apiInstanceObj;
 		}catch(Exception e) {

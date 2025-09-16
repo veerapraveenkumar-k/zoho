@@ -54,7 +54,8 @@ public class ImportUserService {
 	
 	public static boolean importUsersFromApi(Instance instanceObj, int id) throws IOException {
 		ApiInstance apiInstanceObj = InstanceDao.getApiInstanceDetails(id);
-		List<ApiUsers> usersList = InstanceUserDao.getApiUsersList(apiInstanceObj.getUrl());
+		List<ApiUsers> usersList = InstanceUserDao.getApiUsersList(apiInstanceObj.getUrl(), apiInstanceObj.getToken());
+		System.out.println(usersList.size());
 		boolean result = InstanceUserDao.importApiUsers(usersList, id);
 		return result;
 	}

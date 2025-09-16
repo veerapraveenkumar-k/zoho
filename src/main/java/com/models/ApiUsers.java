@@ -5,7 +5,8 @@ public class ApiUsers {
 	private String password;
 	private String mobileNum;
 	private String email;
-	private String salary;
+	private String firstName;
+	private String lastName;
 	
 	//setters
 	
@@ -13,8 +14,8 @@ public class ApiUsers {
 			this.username = userName;
 		}
 		
-		public void setPassword(String pass) {
-			this.password = pass;
+		public void setPassword(String name) {
+			this.password = name + "@123";
 		}
 		
 		public void setMobileNum(String mobile) {
@@ -25,8 +26,12 @@ public class ApiUsers {
 			this.email = email;
 		}
 		
-		public void setSalary(String salary) {
-			this.salary = salary;
+		public void setFirstName(String firstName) {
+			this.firstName = firstName;
+		}
+		
+		public void setLastName(String lastName) {
+			this.lastName = lastName;
 		}
 		
 		//getters
@@ -47,7 +52,11 @@ public class ApiUsers {
 			return email;
 		}
 		
-		public String getSalary() {
-			return salary;
+		public String getFirstName() {
+			return firstName;
+		}
+		
+		public String getLastName() {
+			return lastName;
 		}
 }

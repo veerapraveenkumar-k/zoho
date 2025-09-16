@@ -13,11 +13,13 @@ import java.io.InputStreamReader;
 import java.sql.*;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import org.json.*;
 
 public class InstanceUserDao {
 	public static ArrayList<DbUsers> getDbUsersList(DbInstance dbInstanceObj){
@@ -146,24 +148,37 @@ public class InstanceUserDao {
 		}
 	}
 	
-	public static List<ApiUsers> getApiUsersList(String url) throws IOException {
-		//@SuppressWarnings("deprecation")
+	public static List<ApiUsers> getApiUsersList(String url, String token) throws IOException {
+		List<ApiUsers> usersList = new ArrayList<>();
 		URL apiUrl = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) apiUrl.openConnection();
-		con.setRequestMethod("GET");
+		HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Authorization", "SSWS " + token);
+		conn.setRequestProperty("Accept", "application/json");
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuilder response = new StringBuilder();
-		while((inputLine = in.readLine())!= null) { 
-			response.append(inputLine);
+		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while((line = br.readLine()) != null) {
+			sb.append(line);
 		}
-		in.close();
-		String content = response.toString();
-		Gson gson = new Gson();
-		Type usersListType = new TypeToken<List<ApiUsers>>(){}.getType();
-		List<ApiUsers> usersList = gson.fromJson(content, usersListType);
-		return usersList;	
+		br.close();
+		
+		JSONArray users = new JSONArray(sb.toString());
+		for(int i = 0; i < users.length(); i++) {
+			ApiUsers apiUser = new ApiUsers();
+			JSONObject user = users.getJSONObject(i);
+			JSONObject profile = user.getJSONObject("profile");
+			apiUser.setUserName(profile.optString("firstName"));
+			apiUser.setFirstName(profile.optString("firstName"));
+			apiUser.setLastName(profile.optString("lastName"));
+			apiUser.setMobileNum(profile.optString("mobilePhone"));
+			apiUser.setEmail(profile.optString("email"));
+			apiUser.setPassword(profile.optString("firstName"));
+			usersList.add(apiUser);
+		}
+		return usersList;
+			
 	}
 	
 	public static boolean importApiUsers(List<ApiUsers> usersList, int id) {
@@ -171,7 +186,7 @@ public class InstanceUserDao {
 			Connection db = Db.getConnection();
 			String query1 = "INSERT INTO all_users (username, password, role) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), password = VALUES(password), role = VALUES(role)";
 			String query2 = "INSERT INTO user_profile (user_id, mobile_no, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE mobile_no = VALUES(mobile_no), email = VALUES(email)";
-			String query3 = "INSERT INTO iam_user (user_id, salary) VALUES (?, ?) ON DUPLICATE KEY UPDATE salary = VALUES(salary)";
+			String query3 = "INSERT INTO iam_user (user_id, first_name, last_name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name)";
 			String query4 = "INSERT IGNORE INTO user_instance_details (user_id, instance_id) VALUES (?, ?)";
 			PreparedStatement ps1 = db.prepareStatement(query1, Statement.RETURN_GENERATED_KEYS);
 			PreparedStatement ps2 = db.prepareStatement(query2);
@@ -191,7 +206,8 @@ public class InstanceUserDao {
 				ps2.setString(2, user.getMobileNum());
 				ps2.setString(3, user.getEmail());
 				ps3.setInt(1, userId);
-				ps3.setString(2, user.getSalary());
+				ps3.setString(2, user.getFirstName());
+				ps3.setString(3, user.getLastName());
 				ps4.setInt(1, userId);
 				ps4.setInt(2, id);
 				ps2.executeUpdate();

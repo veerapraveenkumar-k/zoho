@@ -14,7 +14,8 @@
 		<c:remove var="msg" scope="session"/>
 	</c:if>
 	<form action="apiConfig" method="post">
-		<input type="text" name="apiKey" required/>
+		URL: <input type="text" name="url" required/>
+		API KEY: <input type="password" name="apiKey" required/>
 		<button type="submit">submit</button>
 	</form>
 </body>
