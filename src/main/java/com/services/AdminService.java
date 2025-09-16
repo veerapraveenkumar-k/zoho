@@ -1,7 +1,9 @@
 package com.services;
 
-import com.dao.AdminDao;
 import com.models.Admin;
+
+import java.util.ArrayList;
+
 import com.dao.*;
 
 public class AdminService {
@@ -22,5 +24,10 @@ public class AdminService {
 	public static Admin getAdminAccess(int id) {
 		Admin admin = AdminDao.getAdminAccess(id);
 		return admin;
+	}
+	
+	public static ArrayList<Admin> getAdminProfileList() {
+		ArrayList<Admin> userList = UserDao.getAdminsList();
+		return userList;
 	}
 }

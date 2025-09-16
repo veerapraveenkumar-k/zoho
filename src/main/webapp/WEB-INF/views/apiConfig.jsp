@@ -9,8 +9,12 @@
 <link rel="stylesheet" href="css/config.css">
 </head>
 <body>
+	<c:if test="${not empty sessionScope.msg }">
+		<p>${sessionScope.msg}</p>
+		<c:remove var="msg" scope="session"/>
+	</c:if>
 	<form action="apiConfig" method="post">
-		<input type="text" name="apiKey"/>
+		<input type="text" name="apiKey" required/>
 		<button type="submit">submit</button>
 	</form>
 </body>

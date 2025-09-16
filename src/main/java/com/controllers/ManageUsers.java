@@ -9,8 +9,10 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.models.Admin;
 import com.models.Common;
 import com.models.User;
+import com.services.AdminService;
 import com.services.UserService;
 import com.utils.Authentication;
 import com.utils.Authorization;
@@ -36,6 +38,12 @@ public class ManageUsers extends HttpServlet {
 		if(role.equals("ADMIN")) {
 			ArrayList<User> userList = UserService.getUserProfileList();
 			request.setAttribute("usersList", userList);
+			request.setAttribute("role", "ADMIN");
+		}
+		if(role.equals("SUPERADMIN")) {
+			ArrayList<Admin> userList = AdminService.getAdminProfileList();
+			request.setAttribute("usersList", userList);
+			request.setAttribute("role", "SUPERADMIN");
 		}
 		request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
 		

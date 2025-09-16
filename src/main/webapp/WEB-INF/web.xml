@@ -107,4 +107,12 @@
   	<servlet-name>DeleteUsers</servlet-name>
   	<url-pattern>/home/deleteUsers</url-pattern>
   </servlet-mapping>
+  <servlet>
+  	<servlet-name>ApiConfig</servlet-name>
+  	<servlet-class>com.controllers.ApiConfig</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>ApiConfig</servlet-name>
+  	<url-pattern>/home/apiConfig</url-pattern>
+  </servlet-mapping>
 </web-app>

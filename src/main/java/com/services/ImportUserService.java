@@ -31,6 +31,8 @@ public class ImportUserService {
 			result = importUserFromDb(instance, instanceId);
 		}else if(instance.getType().equals("JSON")) {
 			result = importUsersFromJson(instance, instanceId);
+		}else {
+			result = importUsersFromApi(instance, instanceId);
 		}
 		return result;
 	}
@@ -49,5 +51,12 @@ public class ImportUserService {
 		return result;
 	}
 	
+	
+	public static boolean importUsersFromApi(Instance instanceObj, int id) throws IOException {
+		ApiInstance apiInstanceObj = InstanceDao.getApiInstanceDetails(id);
+		List<ApiUsers> usersList = InstanceUserDao.getApiUsersList(apiInstanceObj.getUrl());
+		boolean result = InstanceUserDao.importApiUsers(usersList, id);
+		return result;
+	}
 
 }

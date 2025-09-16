@@ -4,6 +4,7 @@ import com.utils.Db;
 import java.sql.*;
 import java.util.*;
 
+import com.models.ApiInstance;
 import com.models.DbInstance;
 import com.models.Instance;
 import com.models.JsonInstance;
@@ -199,7 +200,7 @@ public class InstanceDao {
 	public static String deleteInstance(int instanceId) {
 		try {
 			Connection db = Db.getConnection();
-			String query = "DELETE u, uid, instance FROM all_users as u JOIN user_instance_details as uid ON u.id = uid.user_id JOIN instance ON uid.instance_id = instance.id WHERE instance.id = ?";
+			String query = "DELETE u, uid, instance FROM all_users as u RIGHT JOIN user_instance_details as uid ON u.id = uid.user_id RIGHT JOIN instance ON uid.instance_id = instance.id WHERE instance.id = ?";
 			PreparedStatement ps = db.prepareStatement(query);
 			ps.setInt(1, instanceId);
 			int row = ps.executeUpdate();
@@ -211,6 +212,72 @@ public class InstanceDao {
 			e.printStackTrace();
 		}
 		return "Failed to delete Instance.";
+	}
+	
+	public static String checkApiInstance(String url, int adminId) {
+		try {
+			Connection db = Db.getConnection();
+			String query = "SELECT * FROM api_instance WHERE url = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setString(1, url);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				return "instance already present";
+			}
+			return createApiInstance(url, adminId);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return "failed to create instance";
+		}
+	}
+	
+	public static String createApiInstance(String url, int adminId) {
+		try {
+			Connection db = Db.getConnection();
+			String query = "INSERT INTO instance (type, admin_id) VALUES (?, ?)";
+			String query1 = "INSERT INTO api_instance (instance_id, url) VALUES (?, ?)";
+			PreparedStatement ps = db.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, "API");
+			ps.setInt(2, adminId);
+			int row = ps.executeUpdate();
+			if(row > 0) {
+				ResultSet rs = ps.getGeneratedKeys();
+				if(rs.next()) {
+					int instanceId = rs.getInt(1);
+					//System.out.println(instanceId);
+					PreparedStatement ps1 = db.prepareStatement(query1);
+					ps1.setInt(1, instanceId);
+					ps1.setString(2, url);
+					int row1 = ps1.executeUpdate();
+					if(row1 > 0) {
+						return "Instance Created Successfully";
+					}
+				}
+			}
+			return "failed to create instance";
+		}catch(Exception e) {
+			e.printStackTrace();
+			return "failed to create instance";
+		}
+	}
+	
+	public static ApiInstance getApiInstanceDetails(int id) {
+		ApiInstance apiInstanceObj = new ApiInstance();
+		try {
+			Connection db = Db.getConnection();
+			String query = "SELECT * FROM api_instance WHERE instance_id = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				apiInstanceObj.setId(rs.getInt("instance_id"));
+				apiInstanceObj.setUrl(rs.getString("url"));
+			}
+			return apiInstanceObj;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return apiInstanceObj;
 	}
 	
 }

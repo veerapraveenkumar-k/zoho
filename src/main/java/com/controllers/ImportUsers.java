@@ -41,7 +41,7 @@ public class ImportUsers extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int instanceId = Integer.parseInt(request.getParameter("import"));
-		boolean result = ImportUserService.importUsers(instanceId);	
+		boolean result = ImportUserService.importUsers(instanceId);
 		if(result) {
 			request.setAttribute("msg", "successfully user imported.");
 			doGet(request, response);

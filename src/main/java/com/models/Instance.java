@@ -32,5 +32,6 @@ public class Instance {
 	public int getAdminId() {
 		return adminId;
 	}
+
 	
 }

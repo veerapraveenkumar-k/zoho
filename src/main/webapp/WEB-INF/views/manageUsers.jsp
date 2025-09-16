@@ -42,29 +42,37 @@
 	<table  class="user-table">
 		<thead class="table-header">
 			<tr>
-				<th class="head-element">ID</th>
-				<th class="head-element">User Name</th>
-				<th class="head-element">Instance Id</th>
-				<th class="head-element">Admin Id</th>
-				<th class="head-element">Type</th>
-				<th class="head-element">Action</th>
+				<c:if test="${role eq 'SUPERADMIN' || role eq 'ADMIN'}"><th class="head-element">ID</th></c:if>
+				<c:if test="${role eq 'SUPERADMIN' || role eq 'ADMIN'}"><th class="head-element">User Name</th></c:if>
+				<c:if test="${role eq 'ADMIN'}"><th class="head-element">Instance Id</th></c:if>
+				<c:if test="${role eq 'ADMIN'}"><th class="head-element">Admin Id</th></c:if>
+				<c:if test="${role eq 'ADMIN'}"><th class="head-element">Type</th></c:if>
+				<c:if test="${role eq 'ADMIN'}"><th class="head-element">Action</th></c:if>
+				<c:if test="${role eq 'SUPERADMIN'}"><th class="head-element">Manage</th></c:if>
 			</tr>
 		</thead>
 		<tbody>
 			<c:forEach var="users" items="${usersList}">
 				<tr>
-					<td class="body"> ${users.getId()} </td>
-					<td class="body">${users.getUserName()}</td>
-					<td class="body">${users.getInstanceId()}</td>
-					<td class="body">${users.getAdminId()}</td>
-					<td class="body">${users.getSource()}</td>
-					<td class="body">
+					<c:if test="${role eq 'SUPERADMIN' || role eq 'ADMIN'}"><td class="body"> ${users.getId()} </td></c:if>
+					<c:if test="${role eq 'SUPERADMIN' || role eq 'ADMIN'}"><td class="body">${users.getUserName()}</td></c:if>
+					<c:if test="${role eq 'ADMIN'}"><td class="body">${users.getInstanceId()}</td></c:if>
+					<c:if test="${role eq 'ADMIN'}"><td class="body">${users.getAdminId()}</td></c:if>
+					<c:if test="${role eq 'ADMIN'}"><td class="body">${users.getSource()}</td></c:if>
+					<c:if test="${role eq 'ADMIN'}"><td class="body">
 					<c:if test="${user.getId() eq users.getAdminId()}">
 					<form action="deleteUsers" method="post">
 						<button value="${users.getId()}" class="import-btn" type="submit" name="delete"> Delete </button>
 					</form>
 					</c:if>
 					</td>
+					</c:if>
+					<c:if test="${role eq 'SUPERADMIN'}"><td class="body">
+					<form action="manageAdmin" method="post">
+						<button value="${users.getId()}" class="import-btn" type="submit" name="manage"> Manage </button>
+					</form>
+					</td>
+					</c:if>
 				</tr>
 			</c:forEach>
 		</tbody>

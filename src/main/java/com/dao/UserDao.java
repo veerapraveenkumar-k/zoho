@@ -90,4 +90,26 @@ public class UserDao {
 			}
 			return "Failed to delete User.";
 	}
+	
+	public static ArrayList<Admin> getAdminsList() {
+		ArrayList<Admin> usersList = new ArrayList<>();
+		try {
+			Connection db = Db.getConnection();
+			String query = "SELECT all_users.id, username, db_access, json_access, iam_access from all_users join admin_access on all_users.id = admin_access.admin_id;";
+			PreparedStatement ps = db.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()) {
+				Admin user = new Admin();
+				user.setId(rs.getInt("id"));
+				user.setUserName(rs.getString("username"));
+				user.setDbAccess(rs.getBoolean("db_access"));
+				user.setJsonAccess(rs.getBoolean("json_access"));
+				user.setIamAccess(rs.getBoolean("iam_access"));
+				usersList.add(user);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return usersList;
+	}
 }

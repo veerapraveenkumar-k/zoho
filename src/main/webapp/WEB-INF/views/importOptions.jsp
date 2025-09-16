@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <style>
-		.import-page-bg {
+	.import-page-bg {
 		width: 100%;
 		padding: 20px;
 	}
@@ -90,10 +90,6 @@
 		</div>
 		<c:if test="${instanceList.size() > 0}">
 			<h1>Instance List: </h1>
-			<c:if test="${not empty sessionScope.msg }">
-				<p>${sessionScope.msg}</p>
-				<c:remove var="msg" scope="session"/>
-			</c:if>
 			<table  class="user-table">
 				<thead class="table-header">
 					<tr>
@@ -119,16 +115,8 @@
 					</c:forEach>
 				</tbody>
 			</table>
-			<p>${msg}</p>
 		</c:if>
+		<p> ${msg} </p>
 	</div>
-<script>
-	/*const deleteInstance = async (id) => {
-		await fetch('/home/deleteInstance', {
-			methods: "DELETE"
-		})
-	}*/
-	
-</script>
 </body>
 </html>
