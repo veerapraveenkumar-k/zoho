@@ -4,6 +4,7 @@ public class ApiInstance {
 	private int instanceId;
 	private String url;
 	private String token;
+	private String type;
 	
 	//getters 
 	public int getId() {
@@ -18,6 +19,10 @@ public class ApiInstance {
 		return token;
 	}
 	
+	public  String getType() {
+		return type;
+	}
+	
 	//setters
 	
 	public void setId(int id) {
@@ -30,5 +35,9 @@ public class ApiInstance {
 	
 	public void setToken(String token) {
 		this.token = token;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
 	}
 }

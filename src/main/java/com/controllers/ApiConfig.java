@@ -17,8 +17,9 @@ public class ApiConfig extends HttpServlet {
 		int adminId = user.getId();
 		String api = request.getParameter("apiKey");
 		String url = request.getParameter("url");
+		String type = request.getParameter("apiType");
 		//System.out.println(api);
-		String result = InstanceDao.checkApiInstance(api, url, adminId);
+		String result = InstanceDao.checkApiInstance(api, url, type, adminId);
 		request.getSession().setAttribute("msg", result);
 		response.sendRedirect("importUsers?Import=API");
 	}

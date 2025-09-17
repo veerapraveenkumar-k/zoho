@@ -16,6 +16,10 @@
 	<form action="apiConfig" method="post">
 		URL: <input type="text" name="url" required/>
 		API KEY: <input type="password" name="apiKey" required/>
+		Choose Type: <select name="apiType">
+			<option value="OKTA"> Okta </option>
+			<option value="POSTMAN">Post Man</option>
+		</select>
 		<button type="submit">submit</button>
 	</form>
 </body>

@@ -9,6 +9,9 @@ import java.util.List;
 
 import com.dao.InstanceDao;
 import com.dao.InstanceUserDao;
+import com.handlers.ApiResponseHandler;
+import com.handlers.ApiResponseHandlerFactory;
+import com.handlers.OktaApiHandler;
 import com.models.*;
 
 public class ImportUserService {
@@ -54,8 +57,8 @@ public class ImportUserService {
 	
 	public static boolean importUsersFromApi(Instance instanceObj, int id) throws IOException {
 		ApiInstance apiInstanceObj = InstanceDao.getApiInstanceDetails(id);
-		List<ApiUsers> usersList = InstanceUserDao.getApiUsersList(apiInstanceObj.getUrl(), apiInstanceObj.getToken());
-		System.out.println(usersList.size());
+		ApiResponseHandler apiClient = ApiResponseHandlerFactory.getApiClient(apiInstanceObj.getType());
+		List<ApiUsers> usersList = apiClient.getUsersList(apiInstanceObj.getUrl(), apiInstanceObj.getToken());
 		boolean result = InstanceUserDao.importApiUsers(usersList, id);
 		return result;
 	}
