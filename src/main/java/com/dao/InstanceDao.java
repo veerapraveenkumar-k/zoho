@@ -222,11 +222,15 @@ public class InstanceDao {
 	public static String deleteInstance(int instanceId) {
 		try {
 			Connection db = Db.getConnection();
-			String query = "DELETE u, uid, instance FROM all_users as u RIGHT JOIN user_instance_details as uid ON u.id = uid.user_id RIGHT JOIN instance ON uid.instance_id = instance.id WHERE instance.id = ?";
+			String query = "DELETE u, uid FROM all_users as u JOIN user_instance_details as uid ON u.id = uid.user_id WHERE uid.instance_id = ?";
+			String query1 = "DELETE FROM instance WHERE id = ?";
 			PreparedStatement ps = db.prepareStatement(query);
+			PreparedStatement ps1 = db.prepareStatement(query1);
 			ps.setInt(1, instanceId);
+			ps1.setInt(1, instanceId);
 			int row = ps.executeUpdate();
-			if(row > 0) {
+			int row1 = ps1.executeUpdate();
+			if(row > 0 && row1 > 0) {
 				return "Instance Successfully Deleted.";
 			}
 			return "Failed to delete Instance.";

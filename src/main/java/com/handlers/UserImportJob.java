@@ -21,7 +21,6 @@ public class UserImportJob implements Job {
 			System.out.println("Instance " + instanceId + " imported Successfully");
 		}else {
 			System.out.println("Instance " + instanceId + " imported Failed");
-		}
-		
+		}	
 	}
 }

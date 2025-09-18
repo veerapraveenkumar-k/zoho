@@ -2,6 +2,7 @@ package com.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.utils.Db;
 import com.models.*;
@@ -112,4 +113,20 @@ public class UserDao {
 		}
 		return usersList;
 	}
+	
+	public static boolean deleteUsersByName(HashSet<String> usersNameSet) {
+		try {
+			Connection db = Db.getConnection();
+			String query = "DELETE FROM all_users WHERE username = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			for(String name: usersNameSet) {
+				ps.setString(1, name);
+				ps.executeUpdate();
+			}
+			return true;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	} 
 }

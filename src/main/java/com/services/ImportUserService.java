@@ -11,7 +11,10 @@ import com.dao.InstanceDao;
 import com.dao.InstanceUserDao;
 import com.handlers.ApiResponseHandler;
 import com.handlers.ApiResponseHandlerFactory;
-import com.handlers.OktaApiHandler;
+import com.handlers.ApiSourceUpdateHandler;
+import com.handlers.DbSourceUpdateHandler;
+import com.handlers.JsonSourceUpdateHandler;
+import com.handlers.UserSourceUpdateHandler;
 import com.models.*;
 
 public class ImportUserService {
@@ -43,14 +46,22 @@ public class ImportUserService {
 	public static boolean importUserFromDb(Instance instanceObj, int instanceId) {
 		DbInstance dbInstanceObj = InstanceDao.getDbInstanceDetails(instanceObj.getId());
 		ArrayList<DbUsers> dbUsersList = InstanceUserDao.getDbUsersList(dbInstanceObj);
-		boolean result = InstanceUserDao.importDbUsers(dbUsersList, instanceId);
+		UserSourceUpdateHandler<DbUsers> handler = new DbSourceUpdateHandler();
+		boolean isDeleted = handler.findDeletedUsers(dbUsersList, instanceId);
+		boolean isInserted = handler.findNewUsers(dbUsersList, instanceId);
+		boolean isUpdated = handler.findUpdatedUsers(dbUsersList, instanceId);
+		boolean result = (isDeleted && isInserted && isUpdated);
 		return result;
 	}
 	
 	public static boolean importUsersFromJson(Instance instanceObj, int instanceId) throws FileNotFoundException, IOException {
 		JsonInstance jsonInstanceObj = InstanceDao.getJsonInstanceDetails(instanceId);
 		List<JsonUser> usersList = InstanceUserDao.getJsonUsersList(jsonInstanceObj.getFileName());
-		boolean result = InstanceUserDao.importJsonUsers(usersList, instanceId);
+		UserSourceUpdateHandler<JsonUser> handler = new JsonSourceUpdateHandler();
+		boolean isDeleted = handler.findDeletedUsers(usersList, instanceId);
+		boolean isInserted = handler.findNewUsers(usersList, instanceId);
+		boolean isUpdated = handler.findUpdatedUsers(usersList, instanceId);
+		boolean result = (isDeleted && isInserted && isUpdated);
 		return result;
 	}
 	
@@ -59,7 +70,11 @@ public class ImportUserService {
 		ApiInstance apiInstanceObj = InstanceDao.getApiInstanceDetails(id);
 		ApiResponseHandler apiClient = ApiResponseHandlerFactory.getApiClient(apiInstanceObj.getType());
 		List<ApiUsers> usersList = apiClient.getUsersList(apiInstanceObj.getUrl(), apiInstanceObj.getToken());
-		boolean result = InstanceUserDao.importApiUsers(usersList, id);
+		UserSourceUpdateHandler<ApiUsers> handler= new ApiSourceUpdateHandler();
+		boolean isDeleted = handler.findDeletedUsers(usersList, id);
+		boolean isInserted = handler.findNewUsers(usersList, id);
+		boolean isUpdated = handler.findUpdatedUsers(usersList, id);
+		boolean result = (isDeleted && isInserted && isUpdated);
 		return result;
 	}
 

@@ -26,6 +26,10 @@
 	.welcome {
 		font-size: 20px;
 	}
+	
+	.logout-btn {
+		cursor: pointer;
+	}
 </style>
 </head>
 <body>
