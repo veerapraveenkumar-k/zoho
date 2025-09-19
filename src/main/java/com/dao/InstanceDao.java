@@ -132,6 +132,7 @@ public class InstanceDao {
 	}
 	
 	public static DbInstance getDbInstanceDetails(int id) {
+		System.out.println(id);
 		DbInstance dbInstanceObj = new DbInstance();
 		try {
 			Connection db = Db.getConnection();
@@ -308,6 +309,26 @@ public class InstanceDao {
 			e.printStackTrace();
 		}
 		return apiInstanceObj;
+	}
+	
+	
+	public static Instance getInstanceByUserId(int id) {
+		Instance instance = new Instance();
+		try {
+			Connection db = Db.getConnection();
+			String query = "SELECT instance.id, instance.type, instance.admin_id FROM instance JOIN user_instance_details ON instance.id = user_instance_details.instance_id JOIN all_users ON user_instance_details.user_id = all_users.id WHERE all_users.id = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				instance.setAdminId(rs.getInt("admin_id"));
+				instance.setId(rs.getInt("id"));
+				instance.setType(rs.getString("type"));
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return instance;
 	}
 	
 }

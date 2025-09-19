@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import com.services.SourceService;
 import com.services.UserService;
 import com.models.*;
 
@@ -24,7 +25,12 @@ public class UpdateProfile extends HttpServlet {
 		String email = request.getParameter("EMAIL");
 		
 		String message = UserService.updateProfileValidaion(id, password, email, mobile, role);
-		//System.out.println(message);
+		try {
+			SourceService.updateUserService(id, user.getUserName(), password, email, mobile);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		request.setAttribute("msg", message);
 		request.getRequestDispatcher("/home/profile").forward(request, response);
 	}

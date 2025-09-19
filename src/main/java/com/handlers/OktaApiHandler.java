@@ -16,7 +16,7 @@ import com.models.ApiUsers;
 public class OktaApiHandler implements ApiResponseHandler{
 	public List<ApiUsers> getUsersList(String url, String apiToken) throws IOException {
 		List<ApiUsers> usersList = new ArrayList<>();
-		URL apiUrl = new URL(url);
+		URL apiUrl = new URL(url + "/api/v1/users");
 		HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("Authorization", "SSWS " + apiToken);

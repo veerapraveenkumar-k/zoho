@@ -7,7 +7,6 @@ import java.util.List;
 import com.dao.InstanceUserDao;
 import com.dao.UserDao;
 import com.models.ApiUsers;
-import com.models.JsonUser;
 
 public class ApiSourceUpdateHandler implements UserSourceUpdateHandler<ApiUsers>{
 	public boolean findDeletedUsers(List<ApiUsers> usersList, int instanceId) {

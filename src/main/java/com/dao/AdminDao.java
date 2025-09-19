@@ -42,7 +42,6 @@ public class AdminDao {
 					}
 				}
 			}
-			
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

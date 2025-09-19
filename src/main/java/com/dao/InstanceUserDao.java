@@ -8,13 +8,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class InstanceUserDao {
 	public static ArrayList<DbUsers> getDbUsersList(DbInstance dbInstanceObj){
@@ -46,44 +53,22 @@ public class InstanceUserDao {
 		return dbusersList;
 	}
 	
-	public static boolean importDbUsers(ArrayList<DbUsers> dbUsersList, int instanceId) {
+	public static HashSet<String> getAllUsersNamebyInstanceId(int id){
+		HashSet<String> users = new  HashSet<String>();
 		try {
 			Connection db = Db.getConnection();
-			String query1 = "INSERT INTO all_users (username, password, role) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), password = VALUES(password), role = VALUES(role)";
-			String query2 = "INSERT INTO user_profile (user_id, mobile_no, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE mobile_no = VALUES(mobile_no), email = VALUES(email)";
-			String query3 = "INSERT INTO db_user (user_id, department) VALUES (?, ?) ON DUPLICATE KEY UPDATE department = VALUES(department)";
-			String query4 = "INSERT IGNORE INTO user_instance_details (user_id, instance_id) VALUES (?, ?)";
-			
-			PreparedStatement ps1 = db.prepareStatement(query1, Statement.RETURN_GENERATED_KEYS);
-			PreparedStatement ps2 = db.prepareStatement(query2);
-			PreparedStatement ps3 = db.prepareStatement(query3);
-			PreparedStatement ps4 = db.prepareStatement(query4);
-			for(int i = 0; i < dbUsersList.size(); i++) {
-				ps1.setString(1, dbUsersList.get(i).getUserName());
-				ps1.setString(2, dbUsersList.get(i).getPassword());
-				ps1.setString(3, "USER");
-				ps1.executeUpdate();
-				ResultSet rs = ps1.getGeneratedKeys();
-				if(rs.next()) {
-				int userId = rs.getInt(1);
-				System.out.println(userId);
-				ps2.setInt(1, userId);
-				ps2.setString(2, dbUsersList.get(i).getMobileNum());
-				ps2.setString(3, dbUsersList.get(i).getEmail());
-				ps3.setInt(1, userId);
-				ps3.setString(2, dbUsersList.get(i).geDepartment());
-				ps4.setInt(1, userId);
-				ps4.setInt(2, instanceId);
-				ps2.executeUpdate();
-				ps3.executeUpdate();
-				ps4.executeUpdate();
-				}
+			String query = "SELECT username FROM all_users JOIN user_instance_details ON all_users.id = user_instance_details.user_id WHERE user_instance_details.instance_id = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()) {
+				users.add(rs.getString("username"));
 			}
-		return true;
+			
 		}catch(Exception e) {
 			e.printStackTrace();
-			return false;
 		}
+		return users;
 	}
 	
 	public static boolean insertDbUsers(List<DbUsers> dbUsersList, int instanceId) {
@@ -165,105 +150,6 @@ public class InstanceUserDao {
 		Type usersListType = new TypeToken<List<JsonUser>>(){}.getType();
 		List<JsonUser> usersList = gson.fromJson(jsonContent, usersListType);
 		return usersList;	
-	}
-	
-	public static boolean importJsonUsers(List<JsonUser> usersList, int id) {
-		try {
-			Connection db = Db.getConnection();
-			String query1 = "INSERT INTO all_users (username, password, role) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), password = VALUES(password), role = VALUES(role)";
-			String query2 = "INSERT INTO user_profile (user_id, mobile_no, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE mobile_no = VALUES(mobile_no), email = VALUES(email)";
-			String query3 = "INSERT INTO json_user (user_id, address) VALUES (?, ?) ON DUPLICATE KEY UPDATE address = VALUES(address)";
-			String query4 = "INSERT IGNORE INTO user_instance_details (user_id, instance_id) VALUES (?, ?)";
-			PreparedStatement ps1 = db.prepareStatement(query1, Statement.RETURN_GENERATED_KEYS);
-			PreparedStatement ps2 = db.prepareStatement(query2);
-			PreparedStatement ps3 = db.prepareStatement(query3);
-			PreparedStatement ps4 = db.prepareStatement(query4);
-			for(JsonUser user: usersList) {
-				//System.out.println(user.getMobileNum());
-				ps1.setString(1, user.getUserName());
-				ps1.setString(2, user.getPassword());
-				ps1.setString(3, "USER");
-				ps1.executeUpdate();
-				ResultSet rs = ps1.getGeneratedKeys();
-				if(rs.next()) {
-				int userId = rs.getInt(1);
-				//System.out.println(userId);
-				ps2.setInt(1, userId);
-				ps2.setString(2, user.getMobileNum());
-				ps2.setString(3, user.getEmail());
-				ps3.setInt(1, userId);
-				ps3.setString(2, user.getAddress());
-				ps4.setInt(1, userId);
-				ps4.setInt(2, id);
-				ps2.executeUpdate();
-				ps3.executeUpdate();
-				ps4.executeUpdate();
-				}
-			}
-			return true;
-		}catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public static boolean importApiUsers(List<ApiUsers> usersList, int id) {
-		try {
-			Connection db = Db.getConnection();
-			String query1 = "INSERT INTO all_users (username, password, role) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), password = VALUES(password), role = VALUES(role)";
-			String query2 = "INSERT INTO user_profile (user_id, mobile_no, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE mobile_no = VALUES(mobile_no), email = VALUES(email)";
-			String query3 = "INSERT INTO iam_user (user_id, first_name, last_name) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name)";
-			String query4 = "INSERT IGNORE INTO user_instance_details (user_id, instance_id) VALUES (?, ?)";
-			PreparedStatement ps1 = db.prepareStatement(query1, Statement.RETURN_GENERATED_KEYS);
-			PreparedStatement ps2 = db.prepareStatement(query2);
-			PreparedStatement ps3 = db.prepareStatement(query3);
-			PreparedStatement ps4 = db.prepareStatement(query4);
-			for(ApiUsers user: usersList) {
-				//System.out.println(user.getMobileNum());
-				ps1.setString(1, user.getUserName());
-				ps1.setString(2, user.getPassword());
-				ps1.setString(3, "USER");
-				ps1.executeUpdate();
-				ResultSet rs = ps1.getGeneratedKeys();
-				if(rs.next()) {
-				int userId = rs.getInt(1);
-				//System.out.println(userId);
-				ps2.setInt(1, userId);
-				ps2.setString(2, user.getMobileNum());
-				ps2.setString(3, user.getEmail());
-				ps3.setInt(1, userId);
-				ps3.setString(2, user.getFirstName());
-				ps3.setString(3, user.getLastName());
-				ps4.setInt(1, userId);
-				ps4.setInt(2, id);
-				ps2.executeUpdate();
-				ps3.executeUpdate();
-				ps4.executeUpdate();
-				}
-			}
-			return true;
-		}catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public static HashSet<String> getAllUsersNamebyInstanceId(int id){
-		HashSet<String> users = new  HashSet<String>();
-		try {
-			Connection db = Db.getConnection();
-			String query = "SELECT username FROM all_users JOIN user_instance_details ON all_users.id = user_instance_details.user_id WHERE user_instance_details.instance_id = ?";
-			PreparedStatement ps = db.prepareStatement(query);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			while(rs.next()) {
-				users.add(rs.getString("username"));
-			}
-			
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return users;
 	}
 	
 	public static boolean insertJsonUsers(List<JsonUser> jsonUsersList, int instanceId) {
@@ -395,6 +281,133 @@ public class InstanceUserDao {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public static boolean deleteDbUsersFromSource(DbInstance dbInstanceObj, String userName) {
+		String url = "jdbc:mysql://" + dbInstanceObj.getHost() + ":" + dbInstanceObj.getPort() + "/" + dbInstanceObj.getDbName();
+		String user = dbInstanceObj.getUser();
+		String password = dbInstanceObj.getPass();
+		String tableName = dbInstanceObj.getTable();
+		try {
+			Connection db = Db.createAndGetConnection(url, user, password);
+			String query = "DELETE FROM " + tableName + " WHERE username = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setString(1, userName);
+			int row = ps.executeUpdate();
+			if(row > 0) {
+				return true;
+			}
+					
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public static void deleteUserFromJsonFile(JsonInstance jsonInstanceObj, String name) throws IOException{
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<JsonUser>>(){}.getType();
+		FileReader reader = new FileReader(jsonInstanceObj.getFileName());
+		List<JsonUser> users = gson.fromJson(reader, listType);
+		reader.close();
+		
+		Iterator<JsonUser> iterator = users.iterator();
+		while(iterator.hasNext()) {
+			if(iterator.next().getUserName().equals(name)) {
+				iterator.remove();
+			}
+		}
+		
+		FileWriter writer = new FileWriter(jsonInstanceObj.getFileName());
+		gson.toJson(users, writer);
+		writer.close();
+	}
+	
+	public static void deleteUserFromOktaApi(ApiInstance apiInstanceObj, String name) throws IOException {
+		URL apiUrl = new URL(apiInstanceObj.getUrl() + "/api/v1/users?q=" + name);
+		HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Authorization", "SSWS " + apiInstanceObj.getToken());
+		conn.setRequestProperty("Accept", "application/json");
+		int responseCode = conn.getResponseCode();
+		if(responseCode != 200) {
+			System.out.println("failed");
+			return;
+		}
+		
+		//parsing
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while((line = br.readLine()) != null) {
+			sb.append(line);
+		}
+		br.close();
+		
+		JSONArray users = new JSONArray(sb.toString());
+		JSONObject user = users.getJSONObject(0);
+		String id = user.optString("id");
+		
+		//delete user
+		
+		URL delteApiUrl = new URL(apiInstanceObj.getUrl() + "/api/v1/users/" + id);
+		HttpURLConnection conn1 = (HttpURLConnection) delteApiUrl.openConnection();
+		conn1.setRequestMethod("DELETE");
+		conn1.setRequestProperty("Authorization", "SSWS " + apiInstanceObj.getToken());
+		conn1.setRequestProperty("Accept", "application/json");
+		int delteResponseCode = conn1.getResponseCode();
+		if(delteResponseCode >= 200 && delteResponseCode < 300) {
+			System.out.println("Api Users Deleted");
+		}
+	}
+	
+	public static boolean updateDbUserInSource(String name, String pass, String email, String mobileNo, DbInstance dbInstanceObj) {
+		String url = "jdbc:mysql://" + dbInstanceObj.getHost() + ":" + dbInstanceObj.getPort() + "/" + dbInstanceObj.getDbName();
+		String user = dbInstanceObj.getUser();
+		String password = dbInstanceObj.getPass();
+		String tableName = dbInstanceObj.getTable();
+		try {
+			Connection db = Db.createAndGetConnection(url, user, password);
+			String query = "UPDATE " + tableName + " SET password = ?, email = ?, mobile_no = ? WHERE username = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setString(1, pass);
+			ps.setString(2, email);
+			ps.setString(3, mobileNo);
+			ps.setString(4, name);
+			int row = ps.executeUpdate();
+			if(row > 0) {
+				return true;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public static void updateUserInJsonFile(String pass, String email, String mobileNum, JsonInstance jsonInstanceObj, String name) throws IOException{
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<JsonUser>>(){}.getType();
+		FileReader reader = new FileReader(jsonInstanceObj.getFileName());
+		List<JsonUser> users = gson.fromJson(reader, listType);
+		reader.close();
+		
+		for(int i = 0; i < users.size(); i++) {
+			if(users.get(i).getUserName().equals(name)) {
+				users.get(i).setPassword(pass);
+				users.get(i).setEmail(email);
+				users.get(i).setMobileNum(mobileNum);
+				break;
+			}
+		}
+		
+		FileWriter writer = new FileWriter(jsonInstanceObj.getFileName());
+		gson.toJson(users, writer);
+		writer.close();
+	}
+	
+	public static void updateUsersInApiSource(String name, String email, String mobileNum, ApiInstance apiInstanceObj) {
+		
 	}
 	
 }

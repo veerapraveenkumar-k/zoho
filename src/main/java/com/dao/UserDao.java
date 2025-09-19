@@ -129,4 +129,20 @@ public class UserDao {
 		}
 		return false;
 	} 
+	
+	public static String getUserNameById(int userId) {
+		try {
+			Connection db = Db.getConnection();
+			String query = "SELECT username FROM all_users WHERE id = ?";
+			PreparedStatement ps = db.prepareStatement(query);
+			ps.setInt(1, userId);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				return rs.getString("username");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 }
