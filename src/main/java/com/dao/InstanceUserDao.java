@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.*;
 
 import com.google.gson.Gson;
@@ -91,7 +92,6 @@ public class InstanceUserDao {
 				ResultSet rs = ps1.getGeneratedKeys();
 				if(rs.next()) {
 				int userId = rs.getInt(1);
-				System.out.println(userId);
 				ps2.setInt(1, userId);
 				ps2.setString(2, dbUsersList.get(i).getMobileNum());
 				ps2.setString(3, dbUsersList.get(i).getEmail());
@@ -172,7 +172,6 @@ public class InstanceUserDao {
 				ResultSet rs = ps1.getGeneratedKeys();
 				if(rs.next()) {
 				int userId = rs.getInt(1);
-				System.out.println(userId);
 				ps2.setInt(1, userId);
 				ps2.setString(2, jsonUsersList.get(i).getMobileNum());
 				ps2.setString(3, jsonUsersList.get(i).getEmail());
@@ -236,7 +235,6 @@ public class InstanceUserDao {
 				ResultSet rs = ps1.getGeneratedKeys();
 				if(rs.next()) {
 				int userId = rs.getInt(1);
-				System.out.println(userId);
 				ps2.setInt(1, userId);
 				ps2.setString(2, apiUsersList.get(i).getMobileNum());
 				ps2.setString(3, apiUsersList.get(i).getEmail());
@@ -406,8 +404,55 @@ public class InstanceUserDao {
 		writer.close();
 	}
 	
-	public static void updateUsersInApiSource(String name, String email, String mobileNum, ApiInstance apiInstanceObj) {
+	public static void updateUsersInApiSource(String name, String email, String mobileNum, String pass, ApiInstance apiInstanceObj) throws Exception {
+		URL apiUrl = new URL(apiInstanceObj.getUrl() + "/api/v1/users?q=" + name);
+		HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Authorization", "SSWS " + apiInstanceObj.getToken());
+		conn.setRequestProperty("Accept", "application/json");
+		int responseCode = conn.getResponseCode();
+		if(responseCode != 200) {
+			System.out.println("failed");
+			return;
+		}
 		
+		//parsing
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while((line = br.readLine()) != null) {
+			sb.append(line);
+		}
+		br.close();
+		
+		JSONArray users = new JSONArray(sb.toString());
+		JSONObject user = users.getJSONObject(0);
+		String id = user.optString("id");
+		
+		String updateProfileJson = "{\"profile\": {"
+				+ "\"email\": \"" + email + "\", "
+				+ "\"login\": \""  + email + "\", "
+				+ "\"mobilePhone\": \"" + mobileNum + "\""
+				+ "}"
+				+ "}";
+		
+		URL updateProfileUrl = new URL(apiInstanceObj.getUrl() + "/api/v1/users/" + id);
+		HttpURLConnection updateConn = (HttpURLConnection) updateProfileUrl.openConnection();
+		updateConn.setRequestMethod("POST");
+		updateConn.setRequestProperty("Authorization", "SSWS " + apiInstanceObj.getToken());
+		updateConn.setRequestProperty("Content-Type", "application/json");
+		updateConn.setDoOutput(true);
+		try (OutputStream os = updateConn.getOutputStream()){
+			byte[] input = updateProfileJson.getBytes("utf-8");
+			os.write(input, 0, input.length);
+		}
+		String response = updateConn.getResponseMessage();
+		int status = updateConn.getResponseCode();
+		if(status >= 200 && status < 300) {
+			System.out.println("SuccessFully Updated");
+		}else {
+			System.out.println("Failed to Updated, Status Code: " + response);
+		}
 	}
-	
 }

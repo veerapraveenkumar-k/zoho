@@ -15,7 +15,7 @@ import com.models.*;
 public class UpdateProfile extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPOST(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
 		Common user = (Common) session.getAttribute("user");
 		int id = user.getId();
@@ -26,7 +26,7 @@ public class UpdateProfile extends HttpServlet {
 		
 		String message = UserService.updateProfileValidaion(id, password, email, mobile, role);
 		try {
-			SourceService.updateUserService(id, user.getUserName(), password, email, mobile);
+			SourceService.updateUsersInSource(id, user.getUserName(), password, email, mobile);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

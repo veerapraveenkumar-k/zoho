@@ -25,7 +25,7 @@ public class SourceService {
 		}
 	}
 	
-	public static void updateUserService(int id, String name, String pass, String email, String mobileNum) throws Exception {
+	public static void updateUsersInSource(int id, String name, String pass, String email, String mobileNum) throws Exception {
 		Instance instanceObj = InstanceDao.getInstanceByUserId(id);
 		switch(instanceObj.getType()) {
 		case "DB":
@@ -36,6 +36,7 @@ public class SourceService {
 			InstanceUserDao.updateUserInJsonFile(pass, email, mobileNum, jsonInstanceObj, name);
 		case "API":
 			ApiInstance apiInstanceObj = InstanceDao.getApiInstanceDetails(instanceObj.getId());
+			InstanceUserDao.updateUsersInApiSource(name, email, mobileNum, pass, apiInstanceObj);
 		}
 	}
 }
